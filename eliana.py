@@ -43,13 +43,10 @@ async def start(_, message):
 )
 async def chat(_, message):
     if message.reply_to_message:
-        if not message.reply_to_message.from_user.id == bot_id:
+        if message.reply_to_message.from_user.id != bot_id:
             return
         await eliana.send_chat_action(message.chat.id, "typing")
-        if not message.text:
-            query = "Hello"
-        else:
-            query = message.text
+        query = message.text or "Hello"
         if len(query) > 50:
             return
         try:
@@ -59,20 +56,19 @@ async def chat(_, message):
             res = str(e)
         await message.reply_text(res)
         await eliana.send_chat_action(message.chat.id, "cancel")
-    else:
-        if message.text:
-            query = message.text
-            if len(query) > 50:
-                return
-            if re.search("[.|\n]{0,}[l|L][u|U][n|N][a|A][.|\n]{0,}", query):
-                await eliana.send_chat_action(message.chat.id, "typing")
-                try:
-                    res = await chatbot(query)
-                    await asyncio.sleep(1)
-                except Exception as e:
-                    res = str(e)
-                await message.reply_text(res)
-                await eliana.send_chat_action(message.chat.id, "cancel")
+    elif message.text:
+        query = message.text
+        if len(query) > 50:
+            return
+        if re.search("[.|\n]{0,}[l|L][u|U][n|N][a|A][.|\n]{0,}", query):
+            await eliana.send_chat_action(message.chat.id, "typing")
+            try:
+                res = await chatbot(query)
+                await asyncio.sleep(1)
+            except Exception as e:
+                res = str(e)
+            await message.reply_text(res)
+            await eliana.send_chat_action(message.chat.id, "cancel")
 
 
 @eliana.on_message(
